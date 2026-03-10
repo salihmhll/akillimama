@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akıllı Mama | Plaka & Doluluk Takibi 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+        .city-grid-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .city-grid-item:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        
+        .status-low { border-left: 3px solid #ef4444; background: rgba(239, 68, 68, 0.1); } /* Kırmızı */
+        .status-mid { border-left: 3px solid #f97316; background: rgba(249, 115, 22, 0.1); } /* Turuncu */
+        .status-high { border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.1); } /* Yeşil */
+
+        .city-grid-item.active {
+            background: #10b981 !important;
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        .city-grid-item.active span { color: #0f172a !important; font-weight: 800; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
+        .progress-bg { background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; }
+        .hero-gradient { background: radial-gradient(circle at top right, #064e3b 0%, #0f172a 60%); }
+        
+        .city-card { transition: all 0.4s ease; }
+        .city-card:hover { transform: scale(1.02); border-color: rgba(16, 185, 129, 0.4); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="fixed top-0 w-full z-50 glass border-b border-white/5 py-4 px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black tracking-tighter text-emerald-400">AKILLI MAMA</h1>
+            <nav class="hidden md:flex space-x-8 text-sm font-bold uppercase tracking-widest">
+                <a href="#harita-section" class="hover:text-emerald-400 transition">📍 Plaka Listesi</a>
+                <a href="#bagis-section" class="hover:text-emerald-400 transition">🦴 Bağış</a>
+                <a href="#otomat-section" class="hover:text-emerald-400 transition">🤖 İstasyonlar</a>
+            </nav>
+            <div class="text-[15px] font-bold bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-emerald-400 uppercase">Salih Ensar Deniz</div>
+        </div>
+    </header>
+
+    <section class="pt-48 pb-20 px-6 hero-gradient">
+        <div class="max-w-7xl mx-auto text-center space-y-8">
+            <div class="inline-block px-4 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-widest">🐾 Geleceğin Mama İstasyonları</div>
+            <h2 class="text-6xl md:text-8xl font-black leading-tight tracking-tight">Dostlarımızı <br><span class="text-emerald-400 italic">Haritadan Besle.</span></h2>
+            <p class="text-slate-400 text-xl max-w-2xl mx-auto">Mama doluluk oranlarını renklerden takip et,<br>seçtiğin şehre anında yaşam desteği gönder.</p>
+        </div>
+    </section>
+
+    <section id="harita-section" class="py-12 px-6 bg-slate-900/50">
+        <div class="max-w-7xl mx-auto">
+            <div class="glass p-8 md:p-12 rounded-[40px] border-emerald-500/20 shadow-2xl">
+                <div class="flex flex-col lg:flex-row justify-between items-center mb-12 gap-8">
+                    <div class="text-center lg:text-left">
+                        <h3 class="text-3xl font-black mb-2 text-white italic uppercase tracking-tighter">📍 Bağış Noktaları (01-81)</h3>
+                        <div class="flex flex-wrap gap-5 mt-2 text-[15px] font-bold uppercase tracking-widest">
+                            <span class="text-red-500">● Kritik (%0-30)</span>
+                            <span class="text-orange-500">● Orta (%31-65)</span>
+                            <span class="text-emerald-500">● Yeterli (%66+)</span>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-500 text-slate-900 p-8 rounded-[30px] shadow-xl min-w-[320px] text-center transform transition hover:rotate-1">
+                        <span class="text-[12px] font-black uppercase opacity-60 block tracking-widest mb-1">Seçili İstasyon</span>
+                        <div id="city-name" class="text-4xl font-black tracking-tighter uppercase leading-none italic">01 ADANA</div>
+                    </div>
+                </div>
+
+                <div id="interactive-grid" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-2"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="bagis-section" class="py-24 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="glass p-10 md:p-16 rounded-[50px] relative overflow-hidden shadow-2xl">
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 blur-[100px]"></div>
+                <h3 class="text-4xl font-black mb-12 text-center italic text-emerald-400">Bağışı Onayla      💳</h3>
+                
+                <form id="donationForm" class="grid md:grid-cols-2 gap-12 relative z-10">
+                    <div class="space-y-8">
+                        <div>
+                            <label class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 block">Gönderilecek Şehir</label>
+                            <div id="checkout-city" class="bg-white/5 p-5 rounded-2xl text-2xl font-black text-emerald-400 border border-emerald-500/20 italic">01 Adana</div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 block">Mama Paketi Seçimi</label>
+                            <select class="w-full bg-slate-800 border-2 border-white/5 p-5 rounded-2xl focus:border-emerald-500 outline-none transition font-bold text-white cursor-pointer appearance-none">
+                                <option>Dostluk Paketi (5 KG) - 600 TL</option>
+                                <option selected>Kahraman Paketi (15 KG) - 1800 TL</option>
+                                <option>Sürü Paketi (30 KG) - 3600 TL</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest mb-1 block">Kart Bilgileri</label>
+                        <input type="text" id="cardName" placeholder="Kart Sahibi Ad Soyad" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-emerald-500 transition text-white uppercase font-bold">
+                        
+                        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-emerald-500 transition text-white font-mono text-lg tracking-widest">
+                        
+                        <div class="grid grid-cols-3 gap-4">
+                            <input type="text" id="expMonth" placeholder="AA" maxlength="2" class="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-emerald-500 transition text-white text-center font-bold">
+                            <input type="text" id="expYear" placeholder="YY" maxlength="2" class="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-emerald-500 transition text-white text-center font-bold">
+                            <input type="text" id="cvv" placeholder="CVV" maxlength="3" class="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-emerald-500 transition text-white text-center font-bold">
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="processPayment()" class="col-span-2 bg-emerald-500 py-7 rounded-[32px] font-black text-slate-900 text-2xl hover:bg-white hover:scale-[1.01] active:scale-95 transition-all shadow-2xl shadow-emerald-500/30 uppercase tracking-tighter">
+                        MAMALARI ŞİMDİ GÖNDER 🐾
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+<section id="otomat-section" class="py-24 px-6 bg-slate-900/50">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
+                <h2 class="text-5xl font-black tracking-tighter italic uppercase">İstasyon Durum Paneli</h2>
+                <div class="relative w-full md:w-96">
+                    <input type="text" id="citySearch" onkeyup="filterCities()" placeholder="Şehir ismine göre filtrele..." class="w-full bg-white/5 border border-white/10 px-8 py-5 rounded-full outline-none focus:border-emerald-500 transition text-white">
+                </div>
+            </div>
+            
+            <div id="otomat-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 h-[650px] overflow-y-auto pr-4 p-4 custom-scroll">
+                </div>
+        </div>
+    </section>
+
+    <footer class="py-16 text-center bg-slate-950 border-t border-white/5">
+        <p class="text-emerald-400 font-black tracking-[0.2em] italic">AKILLI MAMA 2026</p>
+        <h1>© 2026 Akıllı Mama Tüm Hakları Saklıdır.</h1>
+    </footer>
+
+    <script>
+        const iller = ["Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Isparta", "Mersin", "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"];
+
+        function initApp() {
+            const grid = document.getElementById('interactive-grid');
+            const container = document.getElementById('otomat-container');
+            
+            iller.forEach((il, index) => {
+                const plaka = (index + 1).toString().padStart(2, '0');
+                const doluluk = Math.floor(Math.random() * 90) + 5;
+                
+                let statusClass = "status-high";
+                let dotColor = "bg-emerald-500";
+                if (doluluk <= 30) { statusClass = "status-low"; dotColor = "bg-red-500"; }
+                else if (doluluk <= 65) { statusClass = "status-mid"; dotColor = "bg-orange-500"; }
+
+                const gridItem = document.createElement('div');
+                gridItem.className = `city-grid-item glass p-3 rounded-xl cursor-pointer text-center group ${statusClass}`;
+                gridItem.id = `grid-${plaka}`;
+                gridItem.onclick = () => selectCity(il, plaka);
+                gridItem.innerHTML = `<div class="flex flex-col"><span class="text-[9px] font-black opacity-30 group-hover:opacity-100">${plaka}</span><span class="text-[10px] font-bold text-slate-300">${il}</span></div>`;
+                grid.appendChild(gridItem);
+
+                const card = document.createElement('div');
+                card.className = "glass p-6 rounded-[35px] city-card group cursor-pointer border-2 border-transparent";
+                card.id = `card-${plaka}`;
+                card.onclick = () => { selectCity(il, plaka); document.getElementById('harita-section').scrollIntoView(); };
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center font-black text-emerald-400">${plaka}</div>
+                        <span class="text-[9px] font-black bg-white/10 px-3 py-1 rounded-full uppercase text-emerald-500">Aktif</span>
+                    </div>
+                    <h4 class="font-black text-xl mb-4 italic uppercase">${il}</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase"><span>Doluluk</span><span class="text-white">%${doluluk}</span></div>
+                        <div class="progress-bg"><div class="h-full transition-all duration-1000 ${dotColor}" style="width: ${doluluk}%"></div></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            selectCity('Adana', '01');
+        }
+
+        function selectCity(name, plaka) {
+            document.getElementById('city-name').innerText = `${plaka} ${name.toUpperCase()}`;
+            document.getElementById('checkout-city').innerText = `${plaka} ${name}`;
+            document.querySelectorAll('.city-grid-item').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(`grid-${plaka}`);
+            if(target) target.classList.add('active');
+        }
+
+        document.getElementById('cardNumber').addEventListener('input', function (e) {
+            let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let parts = [];
+            for (let i = 0; i < v.length; i += 4) { parts.push(v.substring(i, i + 4)); }
+            e.target.value = parts.join(' ');
+        });
+
+        function isValidLuhn(number) {
+            let sum = 0; let double = false;
+            for (let i = number.length - 1; i >= 0; i--) {
+                let n = parseInt(number[i]);
+                if (double) { if ((n *= 2) > 9) n -= 9; }
+                sum += n; double = !double;
+            }
+            return (sum % 10) === 0;
+        }
+
+        function processPayment() {
+            const cardNo = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            if (!isValidLuhn(cardNo) || cardNo.length < 16) { alert("Geçersiz Kart Numarası!"); return; }
+            alert("Bağış Başarılı! 🐾");
+        }
+
+        function filterCities() {
+            const val = document.getElementById('citySearch').value.toLowerCase();
+            document.querySelectorAll('.city-card').forEach(c => {
+                c.style.display = c.querySelector('h4').innerText.toLowerCase().includes(val) ? "block" : "none";
+            });
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
